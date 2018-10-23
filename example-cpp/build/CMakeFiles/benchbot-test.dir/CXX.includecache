@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/suddrey/scratch/benchbot/benchbot-examples/example-cpp/main.cpp
+benchbot/benchbot.hpp
+-
+benchbot/grid_map.hpp
+-
+iostream
+-
+

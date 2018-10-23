@@ -1,0 +1,1 @@
+/usr/bin/c++      CMakeFiles/benchbot-test.dir/main.cpp.o  -o benchbot-test -rdynamic -lbenchbot -lbenchbot -lcurl -ljsoncpp -lopencv_core -lopencv_highgui -lopencv_imgproc 
