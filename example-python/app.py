@@ -2,28 +2,21 @@ import os
 from benchbot import BenchBot
 from yolo import Detector
 
-path = os.path.dirname(os.path.abspath(__file__))
+#path = os.path.dirname(os.path.abspath(__file__))
+detector = Detector()
 
-benchbot = BenchBot()
-detector = Detector(path + '/yolo')
+with Benchbot() as benchbot:
 
-solution = {}
+	locations = benchbot.get('locations')
 
-while True:
-    location = benchbot.get('location')    
-    image = benchbot.getImage()
+	for location in locations:
+		benchbot.send('goto', {'id': location})
+		image = benchbot.getImage()
+	
+		benchbot.store(location + '-image', image)
 
-    detections = detector.detect(image)
+		detections = detector.detect(image)
 
-    solution[location['location_id']] = [item[0] for item in detections]
-    
-    result = benchbot.send('next')
-    
-    if result['result'] != 0:
-        break
-
-print benchbot.send('complete', {
-  'id': 'main', 
-  'data': solution
-})
-print 'Solution:', solution
+    if 'bottle' in [item[0] for item in detections]:
+      benchbot.send('complete', {'id': 'item_at', 'location': location})
+      break
