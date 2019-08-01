@@ -1,0 +1,5 @@
+*.sw
+
+# Don't store pickles
+/pickle/
+!/pickle/main.py
