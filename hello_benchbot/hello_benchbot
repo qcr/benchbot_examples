@@ -1,0 +1,61 @@
+#!/usr/bin/env python
+
+# Repeatedly perform the first available action, & visualise observations
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+from benchbot_api.benchbot import BenchBot
+
+
+class VisualiserAgent(object):
+
+    def __init__(self):
+        self.fig = None
+        self.axs = None
+
+    def visualise_observations(self, observations):
+        if self.fig is None:
+            plt.ion()
+            self.fig, self.axs = plt.subplots(2, 2)
+            self.fig.canvas.set_window_title("Agent Observations")
+        self.axs[0, 0].clear()
+        self.axs[0, 0].imshow(observations['image_rgb'])
+        self.axs[0, 0].get_xaxis().set_visible(False)
+        self.axs[0, 0].get_yaxis().set_visible(False)
+        self.axs[0, 0].set_title("image_rgb")
+        self.axs[1, 0].clear()
+        self.axs[1, 0].imshow(observations['image_depth'],
+                              cmap="hot",
+                              clim=(np.amin(observations['image_depth']),
+                                    np.amax(observations['image_depth'])))
+        self.axs[1, 0].get_xaxis().set_visible(False)
+        self.axs[1, 0].get_yaxis().set_visible(False)
+        self.axs[1, 0].set_title("image_depth")
+        self.axs[0, 1].clear()
+        self.axs[0, 1].plot(0, 0, c='r', marker=">")
+        self.axs[0, 1].scatter(
+            [x[0] * np.cos(x[1]) for x in observations['laser']['scans']],
+            [x[0] * np.sin(x[1]) for x in observations['laser']['scans']],
+            c='k',
+            s=4,
+            marker='s')
+        self.axs[0, 1].set_title("laser (robot frame)")
+        self.axs[1, 1].clear()
+        # TODO
+        self.axs[1, 1].plot()
+        self.axs[1, 1].set_title("poses (world frame)")
+        raw_input("Press Enter to execute next action")
+
+
+bb = BenchBot()
+a = VisualiserAgent()
+
+observations = bb.reset()
+result = None
+for i in range(5, 0, -1):
+    print("%d actions left" % i)
+    a.visualise_observations(observations)
+    observations, reward, info = bb.step(bb.actions[0])
+print("FINISHED. Returning task result: %s" % result)
+bb.finish(result)
