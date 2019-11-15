@@ -56,8 +56,8 @@ class InteractiveAgent(object):
         while (action is None):
             try:
                 action_text = input(
-                    "Enter next action (either 'd,<distance_in_metres>'"
-                    " or 'a,<angle_in_degrees>'): ").split(",")
+                    "Enter next action (either 'd <distance_in_metres>'"
+                    " or 'a <angle_in_degrees>'): ").split(" ")
                 if action_text[0] == 'a':
                     action = 'move_angle'
                     action_args = {
