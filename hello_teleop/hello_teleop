@@ -1,0 +1,33 @@
+#!/usr/bin/env python
+
+# Agent to go back & forth along a line, visualising the observations at each
+# step
+
+from benchbot_api.benchbot import BenchBot
+
+from drive_agent import DriveAgent
+from os import system
+
+def print_menu(current_agent):
+    print("############################################################################")
+    print("                           Benchbot Teleop Demo!                            ")
+    print("############################################################################")
+    print("Use arrow keys to drive forward, backward, or turn in one \"step\"")
+    print("Press 'o' to change step sizes when teleop driving")
+    print("For more precise benchbot control see hello_active demo")
+    print("Current step sizes: forward/backward "+\
+          "{0:.2f} metres, angle {1:.2f} degrees".format(current_agent.distance_step, 
+                                                         current_agent.angle_step))
+    print("############################################################################")
+
+bb = BenchBot()
+a = DriveAgent()
+
+observations = bb.reset()
+result = None
+while not a.is_done():
+    system('clear')
+    print_menu(a)
+    action, action_args = a.pick_action(observations)
+    observations, reward, info = bb.step(action, **action_args)
+bb.finish(result)
