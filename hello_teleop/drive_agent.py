@@ -17,7 +17,7 @@ class DriveAgent(object):
         self.axs = None
         self.distance_step = 0.1
         self.angle_step = 1.0
-        self.last_command_str = None
+        self.print_msg = ""
 
     def __visualise_observations(self, observations):
         if self.fig is None:
@@ -67,6 +67,7 @@ class DriveAgent(object):
 
         action = None
         action_args = None
+        print_msg = ""
 
         # Nested function for handling key event from keyboard listener
         # that can output an action based on key strokes
@@ -92,24 +93,28 @@ class DriveAgent(object):
                 action = 'move_distance'
                 action_args = {'distance': self.distance_step}
                 print("\rforwards {0:.2f} metres".format(self.distance_step))
+                self.print_msg = "forwards {0:.2f} metres".format(self.distance_step)
 
             # Backwards command
             elif key == Key.down:
                 action = 'move_distance'
                 action_args = {'distance': -self.distance_step}
                 print("\rbackwards {0:.2f} metres".format(self.distance_step))
+                self.print_msg = "backwards {0:.2f} metres".format(self.distance_step)
 
             # Turn right command
             elif key == Key.right:
                 action = 'move_angle'
                 action_args = {'angle': np.radians(-self.angle_step)}
                 print("\rright {0:.2f} degrees".format(self.angle_step))
+                self.print_msg = "right {0:.2f} degrees".format(self.angle_step)
 
             # Turn left command
             elif key == Key.left:
                 action = 'move_angle'
                 action_args = {'angle': np.radians(self.angle_step)}
                 print("\rleft {0:.2f} degrees".format(self.angle_step))
+                self.print_msg = "left {0:.2f} degrees".format(self.angle_step)
 
             else:
                 # Need to use a try except here because only way to check if the key was a letter?
@@ -118,10 +123,12 @@ class DriveAgent(object):
                         print("")
                         tcflush(sys.stdin, TCIFLUSH)
                         # Check how to safely take these inputs and handle exceptions
-                        self.distance_step = float(input("\rgive new distance step size in metres: "))
+                        self.distance_step = float(input("give new distance step size in metres: "))
                         self.angle_step = float(input("give new angle step size in degrees: "))
                         action = 'move_distance'
                         action_args = {'distance': 0}
+                        self.print_msg = ""
+
                 except AttributeError:
                     # Do nothing if it is a special key we don't care about
                     pass
@@ -170,6 +177,6 @@ class DriveAgent(object):
         #         action = None
         # return action, action_args
 
-        print("\rChosen Action: {}".format(action))
-        print("Action Args: {}".format(action_args))
+        # print("\rChosen Action: {}".format(action))
+        # print("Action Args: {}".format(action_args))
         return action, action_args

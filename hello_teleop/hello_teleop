@@ -19,6 +19,12 @@ def print_menu(current_agent):
           "{0:.2f} metres, angle {1:.2f} degrees".format(current_agent.distance_step, 
                                                          current_agent.angle_step))
     print("############################################################################")
+    if len(current_agent.print_msg) > 0:
+        print("\n"+current_agent.print_msg, end='')
+
+    else:
+        print("\n" + current_agent.print_msg, end='')
+
 
 bb = BenchBot()
 a = DriveAgent()
