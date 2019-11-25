@@ -121,7 +121,7 @@ class DriveAgent(object):
                         self.distance_step = float(input("\rgive new distance step size in metres: "))
                         self.angle_step = float(input("give new angle step size in degrees: "))
                         action = 'move_distance'
-                        action_args = {'distance': 0.00001}
+                        action_args = {'distance': 0}
                 except AttributeError:
                     # Do nothing if it is a special key we don't care about
                     pass
