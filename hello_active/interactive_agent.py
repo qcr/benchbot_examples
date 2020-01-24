@@ -44,6 +44,7 @@ class InteractiveAgent(object):
         # TODO
         self.axs[1, 1].plot()
         self.axs[1, 1].set_title("poses (world frame)")
+        plt.pause(0.01)
 
     def is_done(self):
         # Go FOREVER
