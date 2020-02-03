@@ -1,5 +1,9 @@
+from __future__ import print_function
+
 import matplotlib.pyplot as plt
 import numpy as np
+import select
+import sys
 
 try:
     input = raw_input
@@ -12,6 +16,10 @@ class InteractiveAgent(object):
     def __init__(self):
         self.fig = None
         self.axs = None
+
+    def __plot_frame(self, frame_data):
+        self.axs[1, 1].quiver([1, 2, 3], [1, 2, 3], [1, 2, 3], [1, 2, 3],
+                              [1, 2, 3], [1, 2, 3])
 
     def __visualise_observations(self, observations):
         if self.fig is None:
@@ -41,10 +49,10 @@ class InteractiveAgent(object):
             marker='s')
         self.axs[0, 1].set_title("laser (robot frame)")
         self.axs[1, 1].clear()
-        # TODO
+        for f in observations['poses']:
+            self.__plot_frame(f)
         self.axs[1, 1].plot()
         self.axs[1, 1].set_title("poses (world frame)")
-        plt.pause(0.01)
 
     def is_done(self):
         # Go FOREVER
@@ -56,9 +64,17 @@ class InteractiveAgent(object):
         action_args = None
         while (action is None):
             try:
-                action_text = input(
+                print(
                     "Enter next action (either 'd <distance_in_metres>'"
-                    " or 'a <angle_in_degrees>'): ").split(" ")
+                    " or 'a <angle_in_degrees>'): ",
+                    end='')
+                sys.stdout.flush()
+                i = None
+                while not i:
+                    i, _, _ = select.select([sys.stdin], [], [], 0)
+                    plt.draw()
+                    self.fig.canvas.start_event_loop(0.0001)
+                action_text = sys.stdin.readline().split(" ")
                 if action_text[0] == 'a':
                     action = 'move_angle'
                     action_args = {
@@ -75,7 +91,8 @@ class InteractiveAgent(object):
                     }
                 else:
                     raise ValueError()
-            except Exception:
+            except Exception as e:
+                print(e)
                 print("ERROR: Invalid selection")
                 action = None
         return action, action_args
