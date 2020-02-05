@@ -1,10 +1,41 @@
+from __future__ import print_function
+
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
+import select
+import sys
 
 try:
     input = raw_input
 except NameError:
     pass
+
+
+def _set_axes_radius(ax, origin, radius):
+    ax.set_xlim3d([origin[0] - radius, origin[0] + radius])
+    ax.set_ylim3d([origin[1] - radius, origin[1] + radius])
+    ax.set_zlim3d([origin[2] - radius, origin[2] + radius])
+
+
+def _set_axes_equal(ax):
+    '''Make axes of 3D plot have equal scale so that spheres appear as spheres,
+    cubes as cubes, etc..  This is one possible solution to Matplotlib's
+    ax.set_aspect('equal') and ax.axis('equal') not working for 3D.
+
+    Input
+      ax: a matplotlib axis, e.g., as output from plt.gca().
+    '''
+
+    limits = np.array([
+        ax.get_xlim3d(),
+        ax.get_ylim3d(),
+        ax.get_zlim3d(),
+    ])
+
+    origin = np.mean(limits, axis=1)
+    radius = 0.5 * np.max(np.abs(limits[:, 1] - limits[:, 0]))
+    _set_axes_radius(ax, origin, radius)
 
 
 class InteractiveAgent(object):
@@ -13,10 +44,44 @@ class InteractiveAgent(object):
         self.fig = None
         self.axs = None
 
+    def __plot_frame(self, frame_name, frame_data):
+        L = 1.0
+        origin = frame_data['translation_xyz']
+        self.axs[1, 1].quiver(origin[0],
+                              origin[1],
+                              origin[2],
+                              1,
+                              0,
+                              0,
+                              length=L,
+                              normalize=True,
+                              color='r')
+        self.axs[1, 1].quiver(origin[0],
+                              origin[1],
+                              origin[2],
+                              0,
+                              1,
+                              0,
+                              length=L,
+                              normalize=True,
+                              color='g')
+        self.axs[1, 1].quiver(origin[0],
+                              origin[1],
+                              origin[2],
+                              0,
+                              0,
+                              1,
+                              length=L,
+                              normalize=True,
+                              color='b')
+        self.axs[1, 1].text(origin[0], origin[1], origin[2], frame_name)
+
     def __visualise_observations(self, observations):
         if self.fig is None:
             plt.ion()
             self.fig, self.axs = plt.subplots(2, 2)
+            self.axs[1, 1].remove()
+            self.axs[1, 1] = self.fig.add_subplot(2, 2, 4, projection='3d')
             self.fig.canvas.set_window_title("Agent Observations")
         self.axs[0, 0].clear()
         self.axs[0, 0].imshow(observations['image_rgb'])
@@ -39,10 +104,14 @@ class InteractiveAgent(object):
             c='k',
             s=4,
             marker='s')
+        self.axs[0, 1].axis('equal')
         self.axs[0, 1].set_title("laser (robot frame)")
         self.axs[1, 1].clear()
-        # TODO
-        self.axs[1, 1].plot()
+        self.__plot_frame('map', {'translation_xyz': [0, 0, 0]})
+        for k, v in observations['poses'].items():
+            self.__plot_frame(k, v)
+        # self.axs[1, 1].axis('equal') Unimplemented for 3d plots... wow...
+        _set_axes_equal(self.axs[1, 1])
         self.axs[1, 1].set_title("poses (world frame)")
 
     def is_done(self):
@@ -55,9 +124,17 @@ class InteractiveAgent(object):
         action_args = None
         while (action is None):
             try:
-                action_text = input(
+                print(
                     "Enter next action (either 'd <distance_in_metres>'"
-                    " or 'a <angle_in_degrees>'): ").split(" ")
+                    " or 'a <angle_in_degrees>'): ",
+                    end='')
+                sys.stdout.flush()
+                i = None
+                while not i:
+                    i, _, _ = select.select([sys.stdin], [], [], 0)
+                    plt.draw()
+                    self.fig.canvas.start_event_loop(0.0001)
+                action_text = sys.stdin.readline().split(" ")
                 if action_text[0] == 'a':
                     action = 'move_angle'
                     action_args = {
@@ -74,7 +151,8 @@ class InteractiveAgent(object):
                     }
                 else:
                     raise ValueError()
-            except Exception:
+            except Exception as e:
+                print(e)
                 print("ERROR: Invalid selection")
                 action = None
         return action, action_args
