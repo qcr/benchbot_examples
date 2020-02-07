@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import select
+import signal
 import sys
 from scipy.spatial.transform import Rotation as Rot
 
@@ -45,6 +46,8 @@ class InteractiveAgent(object):
         self.fig = None
         self.axs = None
 
+        signal.signal(signal.SIGINT, self._die_gracefully)
+
     def __plot_frame(self, frame_name, frame_data):
         # NOTE currently assume that everything has parent frame 'map'
         L = 0.2
@@ -55,11 +58,11 @@ class InteractiveAgent(object):
         if 'rotation_rpy' in frame_data.keys():
             orientation = frame_data['rotation_rpy']
         else:
-            orientation = [0,0,0]
+            orientation = [0, 0, 0]
         rot_obj = Rot.from_euler('XYZ', orientation)
-        x_vector = rot_obj.apply([1,0,0])
-        y_vector = rot_obj.apply([0,1,0])
-        z_vector = rot_obj.apply([0,0,1])
+        x_vector = rot_obj.apply([1, 0, 0])
+        y_vector = rot_obj.apply([0, 1, 0])
+        z_vector = rot_obj.apply([0, 0, 1])
         self.axs[1, 1].quiver(origin[0],
                               origin[1],
                               origin[2],
@@ -126,6 +129,10 @@ class InteractiveAgent(object):
         # self.axs[1, 1].axis('equal') Unimplemented for 3d plots... wow...
         _set_axes_equal(self.axs[1, 1])
         self.axs[1, 1].set_title("poses (world frame)")
+
+    def _die_gracefully(self, sig, frame):
+        print("")
+        sys.exit(0)
 
     def is_done(self):
         # Go FOREVER
