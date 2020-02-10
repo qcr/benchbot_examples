@@ -20,6 +20,8 @@ class InteractiveAgent(object):
         self.axs = None
         self.vis = ObservationVisualiser()
 
+        self.step_count = 0
+
         signal.signal(signal.SIGINT, self._die_gracefully)
 
     def _die_gracefully(self, sig, frame):
@@ -31,7 +33,7 @@ class InteractiveAgent(object):
         return False
 
     def pick_action(self, observations):
-        self.vis.visualise(observations)
+        self.vis.visualise(observations, self.step_count)
         action = None
         action_args = None
         while (action is None):
@@ -66,4 +68,5 @@ class InteractiveAgent(object):
                 print(e)
                 print("ERROR: Invalid selection")
                 action = None
+        self.step_count += 1
         return action, action_args
