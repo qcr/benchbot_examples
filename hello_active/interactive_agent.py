@@ -16,10 +16,7 @@ except NameError:
 class InteractiveAgent(object):
 
     def __init__(self):
-        self.fig = None
-        self.axs = None
         self.vis = ObservationVisualiser()
-
         self.step_count = 0
 
         signal.signal(signal.SIGINT, self._die_gracefully)
