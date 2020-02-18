@@ -3,6 +3,7 @@ FROM benchbot/submission:base
 
 # Install any extra dependencies you may have
 RUN pip install matplotlib
+RUN pip install scipy
 
 # Add the files from your solution
 ADD hello_active .
