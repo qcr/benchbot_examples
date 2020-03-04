@@ -79,7 +79,7 @@ class InteractiveAgent(Agent):
                 print("ERROR: Invalid selection")
                 action = None
         self.step_count += 1
-        return ((action, action_args) if action in action_list else (None, {}))
+        return (action, action_args)
 
     def save_result(self, filename):
         # We have no results to save here

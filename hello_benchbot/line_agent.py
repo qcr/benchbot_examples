@@ -59,7 +59,7 @@ class LineAgent(Agent):
             self.iteration_count += 1
         else:
             self.next_action_index += 1
-        return (action if action[0] in action_list else (None, {}))
+        return action
 
     def save_result(self, filename):
         # We have no results to save here

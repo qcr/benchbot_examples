@@ -50,7 +50,7 @@ class GuidedAgent(Agent):
             sys.stdin.readline()
 
         self.step_count += 1
-        return ('move_next', {}) if 'move_next' in action_list else (None, {})
+        return ('move_next', {})
 
     def save_result(self, filename):
         # We have no results to save here
