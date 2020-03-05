@@ -4,6 +4,7 @@ import select
 import signal
 import sys
 
+from benchbot_api import ActionResult, Agent
 from benchbot_api.tools import ObservationVisualiser
 
 try:
@@ -12,7 +13,7 @@ except NameError:
     pass
 
 
-class GuidedAgent(object):
+class GuidedAgent(Agent):
 
     def __init__(self):
         self.vis = ObservationVisualiser()
@@ -24,11 +25,19 @@ class GuidedAgent(object):
         print("")
         sys.exit(0)
 
-    def is_done(self):
-        # TODO exit when through list of poses
-        return False
+    def is_done(self, action_result):
+        # Go forever as long as we have a action_result of SUCCESS
+        return action_result != ActionResult.SUCCESS
 
-    def pick_action(self, observations):
+    def pick_action(self, observations, action_list):
+        # Perform a sanity check to confirm we have valid actions available
+        if 'move_next' not in action_list:
+            raise ValueError(
+                "We don't have any usable actions. Is BenchBot running in the "
+                "right mode (passive), or should it have exited (collided / "
+                "finished)?")
+
+        # Update the visualisation
         self.vis.visualise(observations, self.step_count)
 
         if self.step_count == 0:
@@ -41,4 +50,8 @@ class GuidedAgent(object):
             sys.stdin.readline()
 
         self.step_count += 1
-        return 'move_next', {}
+        return ('move_next', {})
+
+    def save_result(self, filename):
+        # We have no results to save here
+        return

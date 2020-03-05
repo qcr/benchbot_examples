@@ -3,16 +3,8 @@
 # Agent to go back & forth along a line, visualising the observations at each
 # step
 
-from benchbot_api.benchbot import BenchBot
-
+from benchbot_api import BenchBot
 from line_agent import LineAgent
 
-bb = BenchBot()
-a = LineAgent()
-
-observations = bb.reset()
-result = None
-while not a.is_done():
-    action, action_args = a.pick_action(observations)
-    observations, reward, info = bb.step(action, **action_args)
-bb.finish(result)
+if __name__ == '__main__':
+    BenchBot(agent=LineAgent()).run()

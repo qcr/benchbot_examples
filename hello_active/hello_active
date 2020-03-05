@@ -4,16 +4,8 @@
 # specified by a user at runtime.  Observations are visualised by the agent at
 # the completion of each action.
 
-from benchbot_api.benchbot import BenchBot
-
+from benchbot_api import BenchBot
 from interactive_agent import InteractiveAgent
 
-bb = BenchBot()
-a = InteractiveAgent()
-
-observations = bb.reset()
-result = None
-while not a.is_done():
-    action, action_args = a.pick_action(observations)
-    observations, reward, info = bb.step(action, **action_args)
-bb.finish(result)
+if __name__ == '__main__':
+    BenchBot(agent=InteractiveAgent()).run()

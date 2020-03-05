@@ -5,6 +5,7 @@ import select
 import signal
 import sys
 
+from benchbot_api import ActionResult, Agent
 from benchbot_api.tools import ObservationVisualiser
 
 try:
@@ -13,7 +14,7 @@ except NameError:
     pass
 
 
-class InteractiveAgent(object):
+class InteractiveAgent(Agent):
 
     def __init__(self):
         self.vis = ObservationVisualiser()
@@ -25,12 +26,24 @@ class InteractiveAgent(object):
         print("")
         sys.exit(0)
 
-    def is_done(self):
-        # Go FOREVER
-        return False
+    def is_done(self, action_result):
+        # Go forever as long as we have a action_result of SUCCESS
+        return action_result != ActionResult.SUCCESS
 
-    def pick_action(self, observations):
+    def pick_action(self, observations, action_list):
+        # Perform a sanity check to confirm we have valid actions available
+        if ('move_distance' not in action_list or
+                'move_angle' not in action_list):
+            raise ValueError(
+                "We don't have any usable actions. Is BenchBot running in the "
+                "right mode (active), or should it have exited (collided / "
+                "finished)?")
+
+        # Update the visualisation
         self.vis.visualise(observations, self.step_count)
+
+        # Prompt the user to pick an active mode action, returning when they
+        # have made a valid selection
         action = None
         action_args = None
         while (action is None):
@@ -66,4 +79,8 @@ class InteractiveAgent(object):
                 print("ERROR: Invalid selection")
                 action = None
         self.step_count += 1
-        return action, action_args
+        return (action, action_args)
+
+    def save_result(self, filename):
+        # We have no results to save here
+        return
