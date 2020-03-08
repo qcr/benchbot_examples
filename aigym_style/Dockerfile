@@ -1,0 +1,12 @@
+# Use a base image which provides as many of your dependencies as possible
+FROM benchbot/submission:base
+
+# Install any extra dependencies you may have
+RUN pip install matplotlib
+RUN pip install scipy
+
+# Add the files from your solution
+ADD aigym_style .
+
+# Make the command used to run your solution the default command
+CMD python aigym_style
