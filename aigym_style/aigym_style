@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Demo agent for passive mode that explicitly uses the "OpenAI Gym" style of
 # employing an agent to solve tasks (see https://gym.openai.com/). Observations
