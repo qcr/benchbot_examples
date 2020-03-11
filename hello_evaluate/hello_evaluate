@@ -8,23 +8,5 @@ from evaluate_agent import EvaluateAgent
 import argparse
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--test", "-t", help="string for what test we are running")
-    parser.add_argument("--task_details", "-td", 
-                        help="""
-task details as used in benchbot_run formatted as follows:
-"TYPE:CONTROL_MODE:LOCALISATION_MODE" where TYPE is the type of
-task, CONTROL_MODE is the control options available on the robot, &
-LOCALISATION_MODE is the accuracy of localisation feedback
-received. For example, a robot with passive control & ground truth
-localisation completing semantic SLAM would be:
-
-    semantic_slam:passive:ground_truth
-"""
-)
-    args = parser.parse_args()
-    # Create dict of task details from the task details provided
-    task_details = {key: val for key, val in 
-                    zip(['type', 'control_mode', 'localisation_mode'], 
-                        args.task_details.split(':'))}
-    BenchBot(agent=EvaluateAgent(args.test, task_details)).run()
+    
+    BenchBot(agent=EvaluateAgent()).run()
