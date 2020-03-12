@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+import os
 import select
 import signal
 import sys
@@ -38,7 +39,9 @@ class EvaluateAgent(Agent):
 
     def save_result(self, filename, empty_results):
         # load the ground truth to base all detections from for eval
-        with open('../ground_truth/house_1.json', 'r') as f:
+        with open(
+                os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                             '../../ground_truth/miniroom_1.json'), 'r') as f:
             h1_gt_dicts = json.load(f)['objects']
 
         # Perfect Semantic SLAM based upon ground-truth (for testing evaluation
@@ -53,6 +56,7 @@ class EvaluateAgent(Agent):
 
         # Add the detections to the empty_results dict provided, & save the
         # results in the requested location
+        empty_results.update({'detections': det_dicts})
         with open(filename, "w") as f:
-            json.dump(empty_results.update({'detections': det_dicts}), f)
+            json.dump(empty_results, f)
         return
