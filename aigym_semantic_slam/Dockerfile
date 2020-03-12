@@ -5,7 +5,7 @@ FROM benchbot/submission:base
 # NIL
 
 # Add the files from your solution
-ADD aigym_style .
+ADD aigym_semantic_slam .
 
 # Make the command used to run your solution the default command
-CMD ./aigym_style
+CMD ./aigym_semantic_slam
