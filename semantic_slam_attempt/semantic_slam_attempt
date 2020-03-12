@@ -27,11 +27,12 @@ class SemanticSlamAgent(Agent):
         self.all_results.append(frame_results)
         return 'move_next', {}
 
-    def save_result(self, filename):
+    def save_result(self, filename, empty_results):
         # Amalgamate our results, & save them to the provided file
-        final_results = votenet_nms(self.all_results, self.votenet)
+        empty_results['detections'] = votenet_nms(self.all_results,
+                                                  self.votenet)
         with open(filename, 'w') as f:
-            json.dump(final_results, f)
+            json.dump(empty_results, f)
         return
 
 _VOTENET_PROMPT=\

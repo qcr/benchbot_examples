@@ -14,6 +14,7 @@ try:
 except NameError:
     pass
 
+
 class EvaluateAgent(Agent):
 
     def __init__(self):
@@ -32,31 +33,26 @@ class EvaluateAgent(Agent):
 
     def pick_action(self, observations, action_list):
         # Should never get to this point?
-        return ('move_next', {}) if 'move_next' in action_list else ('move_angle', {1.0})
+        return ('move_next',
+                {}) if 'move_next' in action_list else ('move_angle', {1.0})
 
-    def save_result(self, filename):
+    def save_result(self, filename, empty_results):
         # load the ground truth to base all detections from for eval
         with open('../ground_truth/house_1.json', 'r') as f:
             h1_gt_dicts = json.load(f)['objects']
 
-        # Perfect Semantic SLAM based upon ground-truth (for testing evaluation process only)
+        # Perfect Semantic SLAM based upon ground-truth (for testing evaluation
+        # process only)
         # Create list of detections. Each detection represented by a dictionary.
-        det_dicts = [{"class": gt_dict["class"], 
-                      "confidence": 1.0,
-                      "centroid": gt_dict["centroid"],
-                      "extent": gt_dict["extent"]
-                      } for gt_dict in h1_gt_dicts]
-        
-        # Define the details of the environment where the results came from
-        # Note that in scene change detection, there will be two numbers (e.g. 1,2 for house:1:2)
-        env_details = {'name': 'house', 'numbers': [1]}
+        det_dicts = [{
+            "class": gt_dict["class"],
+            "confidence": 1.0,
+            "centroid": gt_dict["centroid"],
+            "extent": gt_dict["extent"]
+        } for gt_dict in h1_gt_dicts]
 
-        # Define the details of the task that was being performed (this should be specific for what
-        # the agent is designed to do). This will have been defined in benchbot_run
-        task_details = {'type': 'semantic_slam', 'control_mode': 'passive', 'localisation_mode': 'ground_truth'}
-
+        # Add the detections to the empty_results dict provided, & save the
+        # results in the requested location
         with open(filename, "w") as f:
-            json.dump({'task_details': task_details,
-                       'environment_details': env_details,
-                       'detections': det_dicts}, f)
+            json.dump(empty_results.update({'detections': det_dicts}), f)
         return

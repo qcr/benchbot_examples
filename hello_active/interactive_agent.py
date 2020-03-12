@@ -81,6 +81,6 @@ class InteractiveAgent(Agent):
         self.step_count += 1
         return (action, action_args)
 
-    def save_result(self, filename):
-        # We have no results to save here
+    def save_result(self, filename, empty_results):
+        # We have no results, we'll skip saving
         return

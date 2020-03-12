@@ -217,7 +217,7 @@ def votenet_detection(net, observations):
             result = {
                 "class": net.class2type[detection[0]],
                 "class_ID": net.type2class[net.class2type[detection[0]]],
-                "score": np.float64(detection[2]),
+                "confidence": np.float64(detection[2]),
                 "box_corners_camera": detection[1]
             }
 
@@ -260,7 +260,7 @@ def votenet_nms(all_results, net):
             box_world[0, 3] = np.max(box_corners_world[:, 0])
             box_world[0, 4] = np.max(box_corners_world[:, 1])
             box_world[0, 5] = np.max(box_corners_world[:, 2])
-            box_world[0, 6] = result["score"]
+            box_world[0, 6] = result["confidence"]
             box_world[0, 7] = result["class_ID"]
             boxes_world.append(box_world)
             results_list.append(result)
@@ -285,7 +285,7 @@ def votenet_nms(all_results, net):
         box_world[0, 3] = np.max(box_corners_world[:, 0])
         box_world[0, 4] = np.max(box_corners_world[:, 1])
         box_world[0, 5] = np.max(box_corners_world[:, 2])
-        box_world[0, 6] = result["score"]
+        box_world[0, 6] = result["confidence"]
         # box_world[0, 7] = result["class_ID"]
         boxes_world.append(box_world)
         results_list.append(result)
