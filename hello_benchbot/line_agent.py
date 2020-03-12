@@ -61,6 +61,6 @@ class LineAgent(Agent):
             self.next_action_index += 1
         return action
 
-    def save_result(self, filename):
-        # We have no results to save here
+    def save_result(self, filename, empty_results):
+        # We have no results, we'll skip saving
         return

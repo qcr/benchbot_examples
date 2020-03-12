@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+
+# TODO
+# Demo agent for passive mode that steps through each of the available poses in
+# the environment, executing the "move_next" action recursively. Observations
+# are visualised by the agent at the completion of each action.
+
+import json
+import os
+import sys
+
+from benchbot_api import BenchBot, ActionResult, Agent
+
+
+class SemanticSlamAgent(Agent):
+
+    def __init__(self):
+        self.votenet = votenet_build()
+        self.all_results = []
+
+    def is_done(self, action_result):
+        # Go forever as long as we have a action_result of SUCCESS
+        return action_result != ActionResult.SUCCESS
+
+    def pick_action(self, observations, action_list):
+        frame_results = votenet_detection(self.votenet, observations)
+        self.all_results.append(frame_results)
+        return 'move_next', {}
+
+    def save_result(self, filename, empty_results):
+        # Amalgamate our results, & save them to the provided file
+        empty_results['detections'] = votenet_nms(self.all_results,
+                                                  self.votenet)
+        with open(filename, 'w') as f:
+            json.dump(empty_results, f)
+        return
+
+_VOTENET_PROMPT=\
+"""ERROR: Could not find 'votenet' in the following folder:\n    %s\n
+Please install votenet & make sure it is available at the above location. Full
+install instructions can be found on the 'votenet' Github page:
+    https://github.com/facebookresearch/votenet
+
+General install instructions:
+    1. Install pytorch:
+        pip install torch torchvision
+    2. Install tensorflow:
+        pip install tensorflow
+    3. Compile CUDA layers for PointNet++:
+        cd pointnet2 && python setup.py install
+    4. Install votenet dependencies:
+        pip install tensorflow opencv-python plyfile \\
+                'trimesh>=2.35.39,<2.35.40' 'networkx>=2.2,<2.3'
+    5. Download pre-trained model & extract to '.../votenet/demo_files':
+        wget "https://drive.google.com/uc?export=download&id=1oem0w5y5pjo2whBhAqTtuaYuyBu1OG8l" \\
+                -O demo_files.zip && unzip demo_files.zip && rm demo_files.zip
+
+To add an existing installation of votnet to this examples simply create a 
+symlink:
+    ln -sv <votenet_install_location> <folder_containing_this_file>
+"""
+
+if __name__ == '__main__':
+    # Check votenet is available ...
+    p = os.path.join(os.path.dirname(__file__), "votenet")
+    if not os.path.isdir(p):
+        print("%s" % _VOTENET_PROMPT % os.path.abspath(p))
+        sys.exit(1)
+    from votenet_benchbot import votenet_build, votenet_detection, votenet_nms
+
+    # Run BenchBot
+    BenchBot(agent=SemanticSlamAgent()).run()

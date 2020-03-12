@@ -2,12 +2,11 @@
 FROM benchbot/submission:base
 
 # Install any extra dependencies you may have
-RUN pip install matplotlib
-RUN pip install scipy
+RUN pip3 install numpy
 
 # Add the files from your solution
 ADD hello_active .
 ADD interactive_agent.py .
 
 # Make the command used to run your solution the default command
-CMD python hello_active
+CMD ./hello_active
