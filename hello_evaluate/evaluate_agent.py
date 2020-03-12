@@ -5,28 +5,14 @@ import select
 import signal
 import sys
 import json
-import numpy as np
 
-from benchbot_api import ActionResult, Agent
-from benchbot_api.tools import ObservationVisualiser
+from benchbot_api import Agent
 
-try:
-    input = raw_input
-except NameError:
-    pass
+_GROUND_TRUTH = os.path.join(os.path.dirname(__file__),
+                             'ground_truth_miniroom_1.json')
 
 
 class EvaluateAgent(Agent):
-
-    def __init__(self):
-        self.vis = ObservationVisualiser()
-        self.step_count = 0
-
-        signal.signal(signal.SIGINT, self._die_gracefully)
-
-    def _die_gracefully(self, sig, frame):
-        print("")
-        sys.exit(0)
 
     def is_done(self, action_result):
         # Finish immediately as we are only evaluating
@@ -34,14 +20,11 @@ class EvaluateAgent(Agent):
 
     def pick_action(self, observations, action_list):
         # Should never get to this point?
-        return ('move_next',
-                {}) if 'move_next' in action_list else ('move_angle', {1.0})
+        return None, {}
 
     def save_result(self, filename, empty_results):
         # load the ground truth to base all detections from for eval
-        with open(
-                os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                             '../../ground_truth/miniroom_1.json'), 'r') as f:
+        with open(_GROUND_TRUTH, 'r') as f:
             h1_gt_dicts = json.load(f)['objects']
 
         # Perfect Semantic SLAM based upon ground-truth (for testing evaluation
