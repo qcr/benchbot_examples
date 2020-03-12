@@ -8,4 +8,4 @@ FROM benchbot/submission:base
 ADD hello_scd .
 
 # Make the command used to run your solution the default command
-CMD python hello_scd
+CMD ./hello_scd

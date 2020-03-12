@@ -9,4 +9,4 @@ ADD hello_passive .
 ADD guided_agent.py .
 
 # Make the command used to run your solution the default command
-CMD python hello_passive
+CMD ./hello_passive

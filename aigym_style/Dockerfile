@@ -8,4 +8,4 @@ FROM benchbot/submission:base
 ADD aigym_style .
 
 # Make the command used to run your solution the default command
-CMD python aigym_style
+CMD ./aigym_style

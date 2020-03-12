@@ -9,4 +9,4 @@ ADD hello_evaluate .
 ADD evaluate_agent.py .
 
 # Make the command used to run your solution the default command
-CMD python hello_evaluate
+CMD ./hello_evaluate
