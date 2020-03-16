@@ -61,9 +61,8 @@ class InteractiveAgent(Agent):
                 if action_text[0] == 'a':
                     action = 'move_angle'
                     action_args = {
-                        'angle':
-                            np.radians(0 if len(action_text) ==
-                                       1 else float(action_text[1]))
+                        'angle': (0 if len(action_text) == 1 else float(
+                            action_text[1]))
                     }
                 elif action_text[0] == 'd':
                     action = 'move_distance'
