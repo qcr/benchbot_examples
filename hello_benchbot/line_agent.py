@@ -14,7 +14,7 @@ class LineAgent(Agent):
     _ACTIONS = [('move_distance', {
         'distance': 1.0
     }), ('move_angle', {
-        'angle': 0.5 * np.pi
+        'angle': 90
     })]
 
     _ACTION_SEQUENCE = [0, 1, 1]
