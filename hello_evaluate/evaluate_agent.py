@@ -5,8 +5,9 @@ import select
 import signal
 import sys
 import json
-
+import numpy as np
 from benchbot_api import Agent
+from classes import CLASS_LIST
 
 _GROUND_TRUTH = os.path.join(os.path.dirname(__file__),
                              'ground_truth_miniroom_1.json')
@@ -31,8 +32,7 @@ class EvaluateAgent(Agent):
         # process only)
         # Create list of detections. Each detection represented by a dictionary.
         det_dicts = [{
-            "class": gt_dict["class"],
-            "confidence": 1.0,
+            "prob_dist": [0.0 if idx != np.argwhere(np.array(CLASS_LIST) == gt_dict["class"])[0][0] else 1.0 for idx in range(len(CLASS_LIST))],
             "centroid": gt_dict["centroid"],
             "extent": gt_dict["extent"]
         } for gt_dict in h1_gt_dicts]
