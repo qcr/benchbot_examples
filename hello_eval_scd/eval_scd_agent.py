@@ -38,7 +38,36 @@ class EvalSCDAgent(Agent):
         gt_add_dicts = [gt_dict for gt_dict in m2_gt_dicts if gt_dict not in m1_gt_dicts]
 
         # Create list of detections. Each detection represented by a dictionary.
-        # Scenario 1: Perfect
+#        # Scenario 1: Perfect
+#
+#        # Add detections for added objects (note state_probs)
+#        det_dicts = [{
+#            "prob_dist": [0.0 if idx != get_class_id(gt_dict['class']) else 1.0 for idx in range(len(CLASS_LIST))],
+#            "centroid": gt_dict["centroid"],
+#            "extent": gt_dict["extent"],
+#            "state_probs": [1.0, 0.0, 0.0]
+#        } for gt_dict in gt_add_dicts]
+#
+#        # Add detections for removed objects (note state_probs)
+#        det_dicts += [{
+#            "prob_dist": [0.0 if idx != get_class_id(gt_dict['class']) else 1.0 for idx in range(len(CLASS_LIST))],
+#            "centroid": gt_dict["centroid"],
+#            "extent": gt_dict["extent"],
+#            "state_probs": [0.0, 1.0, 0.0]
+#        } for gt_dict in gt_rem_dicts]
+#
+
+#        # Scenario 2: Only added (No FP)
+#
+#        # Add detections for added objects (note state_probs)
+#        det_dicts = [{
+#            "prob_dist": [0.0 if idx != get_class_id(gt_dict['class']) else 1.0 for idx in range(len(CLASS_LIST))],
+#            "centroid": gt_dict["centroid"],
+#            "extent": gt_dict["extent"],
+#            "state_probs": [1.0, 0.0, 0.0]
+#        } for gt_dict in gt_add_dicts]
+#
+        # Scenario 3: Only added (FPs)
 
         # Add detections for added objects (note state_probs)
         det_dicts = [{
@@ -48,18 +77,29 @@ class EvalSCDAgent(Agent):
             "state_probs": [1.0, 0.0, 0.0]
         } for gt_dict in gt_add_dicts]
 
-        # Add detections for removed objects (note state_probs)
+        # Add detections for removed objects (note state_probs currently say added with 50% confidence)
         det_dicts += [{
             "prob_dist": [0.0 if idx != get_class_id(gt_dict['class']) else 1.0 for idx in range(len(CLASS_LIST))],
             "centroid": gt_dict["centroid"],
             "extent": gt_dict["extent"],
-            "state_probs": [0.0, 1.0, 0.0]
+            "state_probs": [0.5, 0.0, 0.5]
         } for gt_dict in gt_rem_dicts]
 
 
         # Add the detections to the empty_results dict provided, & save the
         # results in the requested location
-        empty_results.update({'detections': det_dicts})
+        empty_results.update({'proposals': det_dicts})
         with open(filename, "w") as f:
             json.dump(empty_results, f)
         return
+
+
+
+
+
+
+
+
+
+
+

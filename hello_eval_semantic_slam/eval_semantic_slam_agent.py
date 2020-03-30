@@ -39,7 +39,7 @@ class EvalSemanticSLAMAgent(Agent):
 
         # Add the detections to the empty_results dict provided, & save the
         # results in the requested location
-        empty_results.update({'detections': det_dicts})
+        empty_results.update({'proposals': det_dicts})
         with open(filename, "w") as f:
             json.dump(empty_results, f)
         return
