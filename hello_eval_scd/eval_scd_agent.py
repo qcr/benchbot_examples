@@ -25,7 +25,7 @@ class EvalSCDAgent(Agent):
         # Should never get to this point?
         return None, {}
 
-    def save_result(self, filename, empty_results):
+    def save_result(self, filename, empty_results, empty_object_fn):
         # NOTE we assume always that we are moving from miniroom1 to miniroom2
         # load the ground truth to base all detections from for eval
         with open(_GROUND_TRUTH1, 'r') as f:
