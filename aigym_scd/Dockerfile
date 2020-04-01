@@ -5,7 +5,7 @@ FROM benchbot/submission:base
 # NIL
 
 # Add the files from your solution
-ADD aigym_scd .
+ADD ./aigym_scd .
 
 # Make the command used to run your solution the default command
 CMD ./aigym_scd

@@ -5,7 +5,7 @@ FROM benchbot/submission:base
 # NIL
 
 # Add the files from your solution
-ADD hello_scd .
+ADD ./hello_scd .
 
 # Make the command used to run your solution the default command
 CMD ./hello_scd
