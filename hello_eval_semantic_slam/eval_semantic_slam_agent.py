@@ -2,18 +2,22 @@ from __future__ import print_function
 
 import os
 import select
-import signal
-import sys
 import json
-import numpy as np
 from benchbot_api import Agent
-from class_list import CLASS_LIST, get_class_id
 
 _GROUND_TRUTH = os.path.join(os.path.dirname(__file__),
                              'ground_truth_miniroom_1.json')
 
+_CLASS_LIST = [
+    'bottle', 'cup', 'knife', 'bowl', 'wine glass', 'fork', 'spoon', 'banana',
+    'apple', 'orange', 'cake', 'potted plant', 'mouse', 'keyboard', 'laptop',
+    'cell phone', 'book', 'clock', 'chair', 'table', 'couch', 'bed', 'toilet',
+    'tv', 'microwave', 'toaster', 'refrigerator', 'oven', 'sink', 'person',
+    'background'
+]
 
-class EvalSemanticSLAMAgent(Agent):
+
+class EvalSemanticSlamAgent(Agent):
 
     def is_done(self, action_result):
         # Finish immediately as we are only evaluating
@@ -23,23 +27,27 @@ class EvalSemanticSLAMAgent(Agent):
         # Should never get to this point?
         return None, {}
 
-    def save_result(self, filename, empty_results):
-        # load the ground truth to base all detections from for eval
+    def save_result(self, filename, empty_results, empty_object_fn):
+        # Load the ground truth file supplied with this example
         with open(_GROUND_TRUTH, 'r') as f:
-            h1_gt_dicts = json.load(f)['objects']
+            gt_objects = json.load(f)['objects']
 
-        # Perfect Semantic SLAM based upon ground-truth (for testing evaluation
-        # process only)
-        # Create list of detections. Each detection represented by a dictionary.
-        det_dicts = [{
-            "prob_dist": [0.0 if idx != get_class_id(gt_dict['class']) else 1.0 for idx in range(len(CLASS_LIST))],
-            "centroid": gt_dict["centroid"],
-            "extent": gt_dict["extent"]
-        } for gt_dict in h1_gt_dicts]
+        # Create an empty object in our semantic map corresponding to each of
+        # the objects we are going to "steal" from the ground truth list
+        empty_results['objects'] = [empty_object_fn() for o in gt_objects]
 
-        # Add the detections to the empty_results dict provided, & save the
-        # results in the requested location
-        empty_results.update({'proposals': det_dicts})
+        # Populate each object in our semantic map with the data from the
+        # ground truth list of objects (we are cheating to perform "perfect"
+        # Semantic SLAM so we can demonstrate the evaluation process)
+        for gt, o in zip(gt_objects, empty_results['objects']):
+            o['label_probs'] = [
+                1.0 if i == _CLASS_LIST.index(gt['class']) else 0.0
+                for i in range(len(_CLASS_LIST))
+            ]
+            o['centroid'] = gt['centroid']
+            o['extent'] = gt['extent']
+
+        # Save the results at the requested location
         with open(filename, "w") as f:
             json.dump(empty_results, f)
         return

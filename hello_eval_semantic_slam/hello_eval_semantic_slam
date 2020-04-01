@@ -4,9 +4,7 @@
 # User gets to define what test is being done for what task
 
 from benchbot_api import BenchBot
-from eval_semantic_slam_agent import EvalSemanticSLAMAgent
-import argparse
+from eval_semantic_slam_agent import EvalSemanticSlamAgent
 
 if __name__ == '__main__':
-    
-    BenchBot(agent=EvalSemanticSLAMAgent()).run()
+    BenchBot(agent=EvalSemanticSlamAgent()).run()
