@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 import os
-import select
 import json
 from benchbot_api import Agent
 
@@ -28,7 +27,7 @@ class EvalSemanticSlamAgent(Agent):
         return None, {}
 
     def save_result(self, filename, empty_results, empty_object_fn):
-        # Load the ground truth file supplied with this example
+        # Load objects from the ground truth file supplied with this example
         with open(_GROUND_TRUTH, 'r') as f:
             gt_objects = json.load(f)['objects']
 
@@ -43,7 +42,7 @@ class EvalSemanticSlamAgent(Agent):
             o['label_probs'] = [
                 1.0 if i == _CLASS_LIST.index(gt['class']) else 0.0
                 for i in range(len(_CLASS_LIST))
-            ]
+            ]  # Probabilistic way to say "100% sure it is class X"
             o['centroid'] = gt['centroid']
             o['extent'] = gt['extent']
 

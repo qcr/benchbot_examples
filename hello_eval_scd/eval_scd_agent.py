@@ -1,21 +1,24 @@
 from __future__ import print_function
 
 import os
-import select
-import signal
-import sys
 import json
-import numpy as np
 from benchbot_api import Agent
-from class_list import CLASS_LIST, get_class_id
 
-_GROUND_TRUTH1 = os.path.join(os.path.dirname(__file__),
-                             'ground_truth_miniroom_1.json')
+_GROUND_TRUTH_1 = os.path.join(os.path.dirname(__file__),
+                               'ground_truth_miniroom_1.json')
+_GROUND_TRUTH_2 = os.path.join(os.path.dirname(__file__),
+                               'ground_truth_miniroom_2.json')
 
-_GROUND_TRUTH2 = os.path.join(os.path.dirname(__file__),                                                                                                                                                                                                                  'ground_truth_miniroom_2.json')
+_CLASS_LIST = [
+    'bottle', 'cup', 'knife', 'bowl', 'wine glass', 'fork', 'spoon', 'banana',
+    'apple', 'orange', 'cake', 'potted plant', 'mouse', 'keyboard', 'laptop',
+    'cell phone', 'book', 'clock', 'chair', 'table', 'couch', 'bed', 'toilet',
+    'tv', 'microwave', 'toaster', 'refrigerator', 'oven', 'sink', 'person',
+    'background'
+]
 
 
-class EvalSCDAgent(Agent):
+class EvalScdAgent(Agent):
 
     def is_done(self, action_result):
         # Finish immediately as we are only evaluating
@@ -26,80 +29,42 @@ class EvalSCDAgent(Agent):
         return None, {}
 
     def save_result(self, filename, empty_results, empty_object_fn):
-        # NOTE we assume always that we are moving from miniroom1 to miniroom2
-        # load the ground truth to base all detections from for eval
-        with open(_GROUND_TRUTH1, 'r') as f:
-            m1_gt_dicts = json.load(f)['objects']
-        with open(_GROUND_TRUTH2, 'r') as f:
-            m2_gt_dicts = json.load(f)['objects']
+        # Load objects from the ground truth files supplied with this example
+        with open(_GROUND_TRUTH_1, 'r') as f:
+            gt_objects_1 = json.load(f)['objects']
+        with open(_GROUND_TRUTH_2, 'r') as f:
+            gt_objects_2 = json.load(f)['objects']
 
-        # Determine which objects are added and which are removed
-        gt_rem_dicts = [gt_dict for gt_dict in m1_gt_dicts if gt_dict not in m2_gt_dicts]
-        gt_add_dicts = [gt_dict for gt_dict in m2_gt_dicts if gt_dict not in m1_gt_dicts]
+        # Generate lists of added & removed objects
+        removed_objects = [o for o in gt_objects_1 if o not in gt_objects_2]
+        added_objects = [o for o in gt_objects_2 if o not in gt_objects_1]
 
-        # Create list of detections. Each detection represented by a dictionary.
-#        # Scenario 1: Perfect
-#
-#        # Add detections for added objects (note state_probs)
-#        det_dicts = [{
-#            "prob_dist": [0.0 if idx != get_class_id(gt_dict['class']) else 1.0 for idx in range(len(CLASS_LIST))],
-#            "centroid": gt_dict["centroid"],
-#            "extent": gt_dict["extent"],
-#            "state_probs": [1.0, 0.0, 0.0]
-#        } for gt_dict in gt_add_dicts]
-#
-#        # Add detections for removed objects (note state_probs)
-#        det_dicts += [{
-#            "prob_dist": [0.0 if idx != get_class_id(gt_dict['class']) else 1.0 for idx in range(len(CLASS_LIST))],
-#            "centroid": gt_dict["centroid"],
-#            "extent": gt_dict["extent"],
-#            "state_probs": [0.0, 1.0, 0.0]
-#        } for gt_dict in gt_rem_dicts]
-#
+        # Create an empty object in our semantic map corresponding to each of
+        # the added or removed objects we are going to "steal" from the ground
+        # truth list
+        empty_results['objects'] = [
+            empty_object_fn() for o in removed_objects + added_objects
+        ]
 
-#        # Scenario 2: Only added (No FP)
-#
-#        # Add detections for added objects (note state_probs)
-#        det_dicts = [{
-#            "prob_dist": [0.0 if idx != get_class_id(gt_dict['class']) else 1.0 for idx in range(len(CLASS_LIST))],
-#            "centroid": gt_dict["centroid"],
-#            "extent": gt_dict["extent"],
-#            "state_probs": [1.0, 0.0, 0.0]
-#        } for gt_dict in gt_add_dicts]
-#
-        # Scenario 3: Only added (FPs)
+        # Populate each object in our semantic map of changed objects with the
+        # data from the ground truth list of changes (we are cheating to
+        # perform "perfect" Scene Change Detection so we can demonstrate the
+        # evaluation process)
+        for i, (gt, o) in enumerate(
+                zip(removed_objects + added_objects,
+                    empty_results['objects'])):
+            o['label_probs'] = [
+                1.0 if i == _CLASS_LIST.index(gt['class']) else 0.0
+                for i in range(len(_CLASS_LIST))
+            ]  # Probabilistic way to say "100% sure it is class X"
+            o['centroid'] = gt['centroid']
+            o['extent'] = gt['extent']
+            o['state_probs'] = (
+                [0.0, 1.0, 0.0]
+                if i < len(removed_objects) else [1.0, 0.0, 0.0]
+            )  # Probabilistic way to say "100% sure object was added/removed"
 
-        # Add detections for added objects (note state_probs)
-        det_dicts = [{
-            "prob_dist": [0.0 if idx != get_class_id(gt_dict['class']) else 1.0 for idx in range(len(CLASS_LIST))],
-            "centroid": gt_dict["centroid"],
-            "extent": gt_dict["extent"],
-            "state_probs": [1.0, 0.0, 0.0]
-        } for gt_dict in gt_add_dicts]
-
-        # Add detections for removed objects (note state_probs currently say added with 50% confidence)
-        det_dicts += [{
-            "prob_dist": [0.0 if idx != get_class_id(gt_dict['class']) else 1.0 for idx in range(len(CLASS_LIST))],
-            "centroid": gt_dict["centroid"],
-            "extent": gt_dict["extent"],
-            "state_probs": [0.5, 0.0, 0.5]
-        } for gt_dict in gt_rem_dicts]
-
-
-        # Add the detections to the empty_results dict provided, & save the
-        # results in the requested location
-        empty_results.update({'proposals': det_dicts})
+        # Save the results at the requested location
         with open(filename, "w") as f:
             json.dump(empty_results, f)
         return
-
-
-
-
-
-
-
-
-
-
-
