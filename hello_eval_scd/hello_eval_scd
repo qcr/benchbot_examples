@@ -4,9 +4,7 @@
 # User gets to define what test is being done for what task
 
 from benchbot_api import BenchBot
-from evaluate_agent import EvaluateAgent
-import argparse
+from eval_scd_agent import EvalScdAgent
 
 if __name__ == '__main__':
-    
-    BenchBot(agent=EvaluateAgent()).run()
+    BenchBot(agent=EvalScdAgent()).run()

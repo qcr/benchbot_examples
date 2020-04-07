@@ -15,8 +15,8 @@ RUN pip3 install scipy
 
 
 # Add the files from your solution
-ADD semantic_slam_attempt .
-ADD votenet_benchbot.py .
+ADD ./semantic_slam_attempt .
+ADD ./votenet_benchbot.py .
 
 # Make the command used to run your solution the default command
 CMD pushd votenet/pointnet2 && python3 setup.py install && popd && ./semantic_slam_attempt
