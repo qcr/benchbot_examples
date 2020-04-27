@@ -3,7 +3,7 @@ FROM benchbot/submission:base
 
 # Install votenet from Facebook Research
 RUN git clone https://github.com/facebookresearch/votenet && \
-    pip3 install torch torchvision tensorflow matplotlib opencv-python \
+    pip3 install 'torch<1.5.0' torchvision tensorflow matplotlib opencv-python \
     plyfile 'trimesh>=2.35.39,<2.35.40' 'networkx>=2.2,<2.3'
 
 RUN apt update && apt install unzip && pushd votenet && wget \
