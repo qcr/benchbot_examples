@@ -135,10 +135,14 @@ def votenet_forward(net, point_cloud):
     toc = time.time()
     print('Inference time: %f' % (toc - tic))
     end_points['point_clouds'] = inputs['point_clouds']
-    pred_map_cls = parse_predictions(end_points, net.eval_config_dict)
-    print('Finished detection. %d object detected.' % (len(pred_map_cls[0])))
-
-    return pred_map_cls
+    try:
+        pred_map_cls = parse_predictions(end_points, net.eval_config_dict)
+        print('Finished detection. %d object detected.' %
+              (len(pred_map_cls[0])))
+        return pred_map_cls
+    except:
+        print('Finished detection. 0 objects detected.')
+        return [None]
 
 
 def compute_world_T_camera(pose_rotation, pose_translation):
