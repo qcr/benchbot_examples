@@ -15,7 +15,7 @@ class SemanticSlamAgent(Agent):
 
     def __init__(self):
         self.votenet = votenet_build()
-        self.all_results = []
+        self.raw_results = []
 
     def is_done(self, action_result):
         # Go forever as long as we have a action_result of SUCCESS
@@ -23,13 +23,12 @@ class SemanticSlamAgent(Agent):
 
     def pick_action(self, observations, action_list):
         frame_results = votenet_detection(self.votenet, observations)
-        self.all_results.append(frame_results)
+        self.raw_results.append(frame_results)
         return 'move_next', {}
 
     def save_result(self, filename, empty_results, empty_object_fn):
         # Amalgamate our results, & save them to the provided file
-        empty_results['detections'] = votenet_nms(self.all_results,
-                                                  self.votenet)
+        empty_results['objects'] = votenet_nms(self.raw_results, self.votenet)
         with open(filename, 'w') as f:
             json.dump(empty_results, f)
         return
