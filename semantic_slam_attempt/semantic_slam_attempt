@@ -10,6 +10,14 @@ import sys
 
 from benchbot_api import BenchBot, ActionResult, Agent
 
+_CLASS_LIST = [
+    'bottle', 'cup', 'knife', 'bowl', 'wine glass', 'fork', 'spoon', 'banana',
+    'apple', 'orange', 'cake', 'potted plant', 'mouse', 'keyboard', 'laptop',
+    'cell phone', 'book', 'clock', 'chair', 'table', 'couch', 'bed', 'toilet',
+    'tv', 'microwave', 'toaster', 'refrigerator', 'oven', 'sink', 'person',
+    'background'
+]
+
 
 class SemanticSlamAgent(Agent):
 
@@ -27,8 +35,9 @@ class SemanticSlamAgent(Agent):
         return 'move_next', {}
 
     def save_result(self, filename, empty_results, empty_object_fn):
-        # Amalgamate our results, & save them to the provided file
-        empty_results['objects'] = votenet_nms(self.raw_results, self.votenet)
+        # Amalgamate our raw results, & save the final object map
+        empty_results['objects'] = votenet_nms(self.raw_results, self.votenet,
+                                               _CLASS_LIST)
         with open(filename, 'w') as f:
             json.dump(empty_results, f)
         return
