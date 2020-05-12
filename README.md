@@ -1,9 +1,9 @@
-**NOTE: this software is part of the BenchBot software stack, and not intended to be run in isolation. For a working BenchBot system, please install the BenchBot software stack by following the instructions [here](https://github.com/RoboticVisionOrg/benchbot). In particular, all native commands shown below should be run through `benchbot_submit`.**
+**NOTE: this software is part of the BenchBot software stack, and not intended to be run in isolation. For a working BenchBot system, please install the BenchBot software stack by following the instructions [here](https://github.com/roboticvisionorg/benchbot). In particular, all native commands shown below should be run through `benchbot_submit`.**
 
 
 # BenchBot Examples
 
-This package contains some simple examples to use with the [BenchBot software stack](https://github.com/RoboticVisionOrg/benchbot). The examples use the [BenchBot API](https://github.com/RoboticVisionOrg/benchbot_api) to control a simulated robot in a realistic 3D simulated environment.
+This package contains some simple examples to use with the [BenchBot software stack](https://github.com/roboticvisionorg/benchbot). The examples use the [BenchBot API](https://github.com/roboticvisionorg/benchbot_api) to control a simulated robot in a realistic 3D simulated environment.
 
 All examples are contained in their own directory, & can be either run natively:
 
@@ -58,5 +58,5 @@ Demonstrates how to explicitly create an "OpenAI Gym" style control loop for tas
 
 ### semantic_slam_attempt
 
-Wraps Facebook Research's [VoteNet](https://github.com/facebookresearch/votenet) 3D object detector, with an attempted solution created for tasks where `type = 'semantic_slam'` & `control_mode = 'passive'`. The included Dockerfile allows running without manually installing VoteNet (note: the compilation of CUDA layers has to be done **everytime** due to limitations in Docker's GPU support - running natively is recommended if possible). The top of the [BenchBot software stack's README](https://github.com/RoboticVisionOrg/benchbot) shows this example in action.
+Wraps Facebook Research's [VoteNet](https://github.com/facebookresearch/votenet) 3D object detector, with an attempted solution created for tasks where `type = 'semantic_slam'` & `control_mode = 'passive'`. The included Dockerfile allows running without manually installing VoteNet (note: the compilation of CUDA layers has to be done **everytime** due to limitations in Docker's GPU support - running natively is recommended if possible). The top of the [BenchBot software stack's README](https://github.com/roboticvisionorg/benchbot) shows this example in action.
  

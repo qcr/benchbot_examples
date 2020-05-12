@@ -10,12 +10,20 @@ import sys
 
 from benchbot_api import BenchBot, ActionResult, Agent
 
+_CLASS_LIST = [
+    'bottle', 'cup', 'knife', 'bowl', 'wine glass', 'fork', 'spoon', 'banana',
+    'apple', 'orange', 'cake', 'potted plant', 'mouse', 'keyboard', 'laptop',
+    'cell phone', 'book', 'clock', 'chair', 'table', 'couch', 'bed', 'toilet',
+    'tv', 'microwave', 'toaster', 'refrigerator', 'oven', 'sink', 'person',
+    'background'
+]
+
 
 class SemanticSlamAgent(Agent):
 
     def __init__(self):
         self.votenet = votenet_build()
-        self.all_results = []
+        self.raw_results = []
 
     def is_done(self, action_result):
         # Go forever as long as we have a action_result of SUCCESS
@@ -23,13 +31,13 @@ class SemanticSlamAgent(Agent):
 
     def pick_action(self, observations, action_list):
         frame_results = votenet_detection(self.votenet, observations)
-        self.all_results.append(frame_results)
+        self.raw_results.append(frame_results)
         return 'move_next', {}
 
     def save_result(self, filename, empty_results, empty_object_fn):
-        # Amalgamate our results, & save them to the provided file
-        empty_results['detections'] = votenet_nms(self.all_results,
-                                                  self.votenet)
+        # Amalgamate our raw results, & save the final object map
+        empty_results['objects'] = votenet_nms(self.raw_results, self.votenet,
+                                               _CLASS_LIST)
         with open(filename, 'w') as f:
             json.dump(empty_results, f)
         return

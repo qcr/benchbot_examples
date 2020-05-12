@@ -248,7 +248,7 @@ def votenet_detection(net, observations):
     return frame_results
 
 
-def votenet_nms(all_results, net):
+def votenet_nms(all_results, net, class_list):
     nms_iou_cls = 0.1  # this threshold for removing duplicates that are of the same class
     boxes_world = []
     results_list = []
@@ -301,6 +301,11 @@ def votenet_nms(all_results, net):
 
     results_final = [results_list[p] for p in pick]
     results_final = jsonify(results_final)
+
+    for r in results_final:
+        r['label_probs'] = [0] * len(class_list)
+        if r['class'] in class_list:
+            r['label_probs'][class_list.index(r['class'])] = r['confidence']
 
     return results_final
 
